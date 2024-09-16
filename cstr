@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+
+import sys
+import getopt
+
+def wrapLineInC(line: str):
+    line = line.replace('\t', '\\t')
+    line = line.replace('\r', '\\r')
+    line = line.replace('\n', '\\n')
+    line = line.replace('\n', '\\n')
+
+    return '"' + line + '"'
+
+options = {"file": ""}
+
+shortopts = "hf:"
+
+def printHelp():
+    print("""usage: cstr [options]
+    options can be:
+
+    -h          print this help
+    -f <file>   writes to the specified file
+                instead of stdout
+""")
+
+def parseOptions():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], shortopts)
+        for opt in opts:
+            match opt[0]:
+                case "-h":
+                    printHelp()
+                    exit(0)
+                case "-f":
+                    options["file"] = opt[1]
+                case _:
+                    print("Unknown option", file=sys.stderr)
+                    exit(1)
+
+    except getopt.GetoptError as err:
+        print(err)
+        exit(1)
+
+"""
+Returns the file to write to, which is either
+stdout or a file provided by options
+"""
+def getFile():
+    if options["file"] != "":
+        file = open(options["file"], "w")
+        # writing header data
+        file.write("#pragma once\n\n")
+        file.write("const char* helpMessage = ")
+        return file
+    else:
+        return sys.stdout
+
+if __name__ == "__main__":
+    try:
+        parseOptions()
+        first = True
+
+        file = getFile()
+
+        for line in sys.stdin:
+            if first:
+                first = False
+            else:
+                file.write("\n")
+
+            wrapped = wrapLineInC(line)
+            file.write(wrapped)
+
+        file.write(";\n") 
+    except KeyboardInterrupt:
+        pass
