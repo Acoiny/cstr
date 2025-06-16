@@ -1,3 +1,7 @@
+> [!WARNING]  
+> This tool is pretty bad and probably won't be updated anytime soon!
+> I would advise not to use it.
+
 ## cstr
 A little tool, to convert any text to C-strings.
 No dependencies required besides CPython.
